@@ -19,129 +19,125 @@ from urllib.parse import urlparse
 
 WORKFLOW = """
 {
-    "input": {
-      "prompt": {
-        "41": {
-          "inputs": {
-            "text": "_POSITIVE_PROMPT",
-            "var_1": "_INSTANCE_PROMPT",
-            "var_2": "_CLASS_PROMPT",
-            "var_3": "",
-            "var_4": "",
-            "var_5": ""
-          },
-          "class_type": "PromptWithTemplate"
+    "41": {
+        "inputs": {
+        "text": "_POSITIVE_PROMPT",
+        "var_1": "_INSTANCE_PROMPT",
+        "var_2": "_CLASS_PROMPT",
+        "var_3": "",
+        "var_4": "",
+        "var_5": ""
         },
-        "11": {
-          "inputs": {
-            "lora_name": "_S3_LORA_PATH",
-            "strength_model": 1,
-            "strength_clip": 1,
-            "BUCKET_ENDPOINT_URL": "_BUCKET_ENDPOINT_URL",
-            "BUCKET_ACCESS_KEY_ID": "_BUCKET_ACCESS_KEY_ID",
-            "BUCKET_SECRET_ACCESS_KEY": "_BUCKET_SECRET_ACCESS_KEY",
-            "BUCKET_NAME": "_BUCKET_NAME",
-            "model": [
-              "4",
-              0
-            ],
-            "clip": [
-              "4",
-              1
-            ]
-          },
-          "class_type": "S3Bucket_Load_LoRA"
+        "class_type": "PromptWithTemplate"
+    },
+    "11": {
+        "inputs": {
+        "lora_name": "_S3_LORA_PATH",
+        "strength_model": 1,
+        "strength_clip": 1,
+        "BUCKET_ENDPOINT_URL": "_BUCKET_ENDPOINT_URL",
+        "BUCKET_ACCESS_KEY_ID": "_BUCKET_ACCESS_KEY_ID",
+        "BUCKET_SECRET_ACCESS_KEY": "_BUCKET_SECRET_ACCESS_KEY",
+        "BUCKET_NAME": "_BUCKET_NAME",
+        "model": [
+            "4",
+            0
+        ],
+        "clip": [
+            "4",
+            1
+        ]
         },
-        "5": {
-          "inputs": {
-            "width": _WIDTH,
-            "height": _HEIGHT,
-            "batch_size": _BATCH_SIZE
-          },
-          "class_type": "EmptyLatentImage"
+        "class_type": "S3Bucket_Load_LoRA"
+    },
+    "5": {
+        "inputs": {
+        "width": _WIDTH,
+        "height": _HEIGHT,
+        "batch_size": _BATCH_SIZE
         },
-        "3": {
-          "inputs": {
-            "seed": _SEED,
-            "steps": _STEPS,
-            "cfg": 8,
-            "sampler_name": "euler",
-            "scheduler": "normal",
-            "denoise": 1,
-            "model": [
-              "11",
-              0
-            ],
-            "positive": [
-              "6",
-              0
-            ],
-            "negative": [
-              "7",
-              0
-            ],
-            "latent_image": [
-              "5",
-              0
-            ]
-          },
-          "class_type": "KSampler"
+        "class_type": "EmptyLatentImage"
+    },
+    "3": {
+        "inputs": {
+        "seed": _SEED,
+        "steps": _STEPS,
+        "cfg": 8,
+        "sampler_name": "euler",
+        "scheduler": "normal",
+        "denoise": 1,
+        "model": [
+            "11",
+            0
+        ],
+        "positive": [
+            "6",
+            0
+        ],
+        "negative": [
+            "7",
+            0
+        ],
+        "latent_image": [
+            "5",
+            0
+        ]
         },
-        "4": {
-          "inputs": {
-            "ckpt_name": "sd_xl_base_1.0.safetensors"
-          },
-          "class_type": "CheckpointLoaderSimple"
+        "class_type": "KSampler"
+    },
+    "4": {
+        "inputs": {
+        "ckpt_name": "sd_xl_base_1.0.safetensors"
         },
-        "6": {
-          "inputs": {
-            "text": [
-              "41",
-              0
-            ],
-            "clip": [
-              "11",
-              1
-            ]
-          },
-          "class_type": "CLIPTextEncode"
+        "class_type": "CheckpointLoaderSimple"
+    },
+    "6": {
+        "inputs": {
+        "text": [
+            "41",
+            0
+        ],
+        "clip": [
+            "11",
+            1
+        ]
         },
-        "7": {
-          "inputs": {
-            "text": "_NEGATIVE_PROMPT",
-            "clip": [
-              "11",
-              1
-            ]
-          },
-          "class_type": "CLIPTextEncode"
+        "class_type": "CLIPTextEncode"
+    },
+    "7": {
+        "inputs": {
+        "text": "_NEGATIVE_PROMPT",
+        "clip": [
+            "11",
+            1
+        ]
         },
-        "8": {
-          "inputs": {
-            "samples": [
-              "3",
-              0
-            ],
-            "vae": [
-              "4",
-              2
-            ]
-          },
-          "class_type": "VAEDecode"
+        "class_type": "CLIPTextEncode"
+    },
+    "8": {
+        "inputs": {
+        "samples": [
+            "3",
+            0
+        ],
+        "vae": [
+            "4",
+            2
+        ]
         },
-        "46": {
-          "inputs": {
-            "filename_prefix": "ComfyUI",
-            "images": [
-              "8",
-              0
-            ]
-          },
-          "class_type": "SaveImage"
-        }
-      }
-    }
-  }
+        "class_type": "VAEDecode"
+    },
+    "46": {
+        "inputs": {
+        "filename_prefix": "ComfyUI",
+        "images": [
+            "8",
+            0
+        ]
+        },
+        "class_type": "SaveImage"
+    } 
+}
 """
 
 
@@ -332,7 +328,8 @@ class Predictor(BasePredictor):
         generator = torch.Generator("cuda").manual_seed(seed)
 
         endpoint_url, s3_lora_path = self.split_s3_endpoint_url_and_path(s3_lora_url)
-        
+        print(f"Endpoint Url: {endpoint_url}")
+
         workflow_string = self.build_workflow_string(
             _POSITIVE_PROMPT = input_prompt,
             _NEGATIVE_PROMPT = negative_prompt,
@@ -359,7 +356,9 @@ class Predictor(BasePredictor):
         ws = websocket.WebSocket()
         ws.connect("ws://{}/ws?clientId={}".format(self.server_address, client_id))
         images = self.get_images(ws, prompt, client_id)
-
+        
+        print(f"Images generated")
+        
         image_paths = []
         for node_id in images:
             for image_data in images[node_id]:
