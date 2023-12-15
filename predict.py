@@ -62,7 +62,7 @@ WORKFLOW = """
         "inputs": {
         "seed": _SEED,
         "steps": _STEPS,
-        "cfg": 8,
+        "cfg": _CFG,
         "sampler_name": "euler",
         "scheduler": "normal",
         "denoise": 1,
@@ -221,7 +221,8 @@ class Predictor(BasePredictor):
     def build_workflow_string(self, **kwargs):
         new_workflow = WORKFLOW
         for key, value in kwargs.items():
-            new_workflow = new_workflow.replace(key, str(value))
+            value = str(value) if value else ""
+            new_workflow = new_workflow.replace(key, value)
         return new_workflow
     
     def extract_region_from_url(self, endpoint_url):
@@ -318,6 +319,7 @@ class Predictor(BasePredictor):
         batch_size: int = Input(description="Number of images to generate", default=1),
         width: int = Input(default=1024),
         height: int = Input(default=1024), 
+        cfg: float = Input(default=8.0),
         seed: int = Input(description="Sampling seed, leave Empty for Random", default=None),
         lora_url: str = Input(
             description="LoRA Model URL from aws or google drive (e.g. https://<bucket-name>.s3.<region>.amazonaws.com/<bucket-name>/<path-to-lora-model>.safetensors)", 
