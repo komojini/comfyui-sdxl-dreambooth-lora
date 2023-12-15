@@ -54,9 +54,9 @@ WORKFLOW = """
         },
         "5": {
           "inputs": {
-            "width": 1024,
-            "height": 1024,
-            "batch_size": "_BATCH_SIZE"
+            "width": _WIDTH,
+            "height": _HEIGHT,
+            "batch_size": _BATCH_SIZE
           },
           "class_type": "EmptyLatentImage"
         },
@@ -308,16 +308,19 @@ class Predictor(BasePredictor):
 
     def predict(
         self,
-        input_prompt: str = Input(description="Prompt", default="A photo of var_1 var_2"),
+        input_prompt: str = Input(description="Prompt", default="A photo of var_1 var_2 (var_1: instance_prompt, var_2: class_prompt)"),
         negative_prompt: str = Input(description="Negative Prompt", default="text, watermark, ugly, blurry"),
         steps: int = Input(
             description="Steps",
             default=20
         ),
-        instance_prompt: str = Input(description="Instance Prompt (var_1)", default="cat"),
-        class_prompt: str = Input(description="Class Prompt (var_2)", default="zwc"),
+        instance_prompt: str = Input(description="Instance Prompt (var_1)", default="zwc"),
+        class_prompt: str = Input(description="Class Prompt (var_2)", default="cat"),
+        batch_size: int = Input(description="Number of images to generate", default=1),
+        width: int = Input(default=1024),
+        height: int = Input(default=1024), 
         seed: int = Input(description="Sampling seed, leave Empty for Random", default=None),
-        s3_lora_url: str = Input(description="S3 LoRA Model URL", default="https://<bucket-name>.s3.<region>.amazonaws.com/<path-to-lora-model>.safetensors"),
+        s3_lora_url: str = Input(description="S3 LoRA Model URL", default="https://<bucket-name>.s3.<region>.amazonaws.com/<bucket-name>/<path-to-lora-model>.safetensors"),
         s3_access_key: str = Input(description="S3 Access Key", default=None),
         s3_secret_access_key: str = Input(description="S3 Secret Access Key", default=None),
         s3_output_dir: str = Input(description="S3 Image Save Directory", default=None)
@@ -335,12 +338,15 @@ class Predictor(BasePredictor):
             _NEGATIVE_PROMPT = negative_prompt,
             _STEPS = steps,
             _SEED = seed,
+            _WIDTH = width,
+            _HEIGHT = height,
             _INSTANCE_PROMPT = instance_prompt,
             _CLASS_PROMPT = class_prompt,
             _S3_LORA_PATH = s3_lora_path,
             _BUCKET_ENDPOINT_URL = endpoint_url,
             _BUCKET_ACCESS_KEY_ID = s3_access_key,
-            _BUCKET_SECRET_ACCESS_KEY = s3_secret_access_key 
+            _BUCKET_SECRET_ACCESS_KEY = s3_secret_access_key,
+            _BATCH_SIZE = batch_size,
         )
         # load config
         prompt = json.loads(workflow_string)
