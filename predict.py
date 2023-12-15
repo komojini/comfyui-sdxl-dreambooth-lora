@@ -350,6 +350,7 @@ class Predictor(BasePredictor):
             _SEED = seed,
             _WIDTH = width,
             _HEIGHT = height,
+            _CFG = cfg,
             _INSTANCE_PROMPT = instance_prompt,
             _CLASS_PROMPT = class_prompt,
             _S3_LORA_PATH = s3_lora_path,
