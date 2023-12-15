@@ -62,8 +62,8 @@ WORKFLOW = """
         },
         "3": {
           "inputs": {
-            "seed": "_SEED",
-            "steps": "_STEPS",
+            "seed": _SEED,
+            "steps": _STEPS,
             "cfg": 8,
             "sampler_name": "euler",
             "scheduler": "normal",
@@ -222,7 +222,7 @@ class Predictor(BasePredictor):
     def build_workflow_string(self, **kwargs):
         new_workflow = WORKFLOW
         for key, value in kwargs.items():
-            new_workflow = new_workflow.replace(key, value)
+            new_workflow = new_workflow.replace(key, str(value))
         return new_workflow
     
     def extract_region_from_url(self, endpoint_url):
