@@ -333,7 +333,6 @@ class Predictor(BasePredictor):
         if seed is None:
             seed = int.from_bytes(os.urandom(3), "big")
         print(f"Using seed: {seed}")
-        generator = torch.Generator("cuda").manual_seed(seed)
 
         if ".s3." in lora_url:
             endpoint_url, s3_lora_path = self.split_s3_endpoint_url_and_path(lora_url)
@@ -369,10 +368,9 @@ class Predictor(BasePredictor):
         client_id = str(uuid.uuid4())
         ws = websocket.WebSocket()
         ws.connect("ws://{}/ws?clientId={}".format(self.server_address, client_id))
+
         images = self.get_images(ws, prompt, client_id)
-        
-        print(f"Images generated")
-        
+        print(f"{len(images)} images generated successfully")
         image_paths = []
         for node_id in images:
             for image_data in images[node_id]:
