@@ -140,6 +140,9 @@ WORKFLOW = """
 }
 """
 
+EXAMPLE_POSITIVE_PROMPT = "artistic photo of 1 var_1 var_2 wearing Santa costume, small cute santa hat, Christmas tree, Christmas style, Christmas concept, (Christmas:1.2), presents, (var_1 var_2:1.3), (midnight:1.5), (fancy:1.5), twinkle, colorful background, fancy wallpaper, professional photo, 4k, profile, Christmas socks, socks"
+EXAMPLE_NEGATIVE_PROMPT = "text, watermark, low quality, day, bad body, monotone background, white wall, white background, bad hat, bad costume, 2, double hat, nsfw, bad hands"
+
 
 class Predictor(BasePredictor):
     def setup(self):
@@ -304,8 +307,8 @@ class Predictor(BasePredictor):
 
     def predict(
         self,
-        input_prompt: str = Input(description="Prompt", default="A photo of var_1 var_2 (var_1: instance_prompt, var_2: class_prompt)"),
-        negative_prompt: str = Input(description="Negative Prompt", default="text, watermark, ugly, blurry"),
+        input_prompt: str = Input(description="Prompt  (instance_prompt: var_1, class_prompt: var_2)", default=EXAMPLE_POSITIVE_PROMPT),
+        negative_prompt: str = Input(description="Negative Prompt", default=EXAMPLE_NEGATIVE_PROMPT),
         steps: int = Input(
             description="Steps",
             default=20
@@ -316,10 +319,13 @@ class Predictor(BasePredictor):
         width: int = Input(default=1024),
         height: int = Input(default=1024), 
         seed: int = Input(description="Sampling seed, leave Empty for Random", default=None),
-        s3_lora_url: str = Input(description="S3 LoRA Model URL", default="https://<bucket-name>.s3.<region>.amazonaws.com/<bucket-name>/<path-to-lora-model>.safetensors"),
-        s3_access_key: str = Input(description="S3 Access Key", default=None),
-        s3_secret_access_key: str = Input(description="S3 Secret Access Key", default=None),
-        s3_output_dir: str = Input(description="S3 Image Save Directory", default=None)
+        lora_url: str = Input(
+            description="LoRA Model URL from aws or google drive (e.g. https://<bucket-name>.s3.<region>.amazonaws.com/<bucket-name>/<path-to-lora-model>.safetensors)", 
+            default="https://drive.google.com/file/d/1aPM277uFZu_m7bAjJBS2Ia03dP5_fk0W/view?usp=sharing"
+        ),
+        s3_access_key: str = Input(description="Required if using non public s3 bucket", default=""),
+        s3_secret_access_key: str = Input(description="Required if using non public s3 bucket", default=""),
+        s3_output_dir: str = Input(description="(Optional) S3 Image Save Directory", default="")
     ) -> List[Path]:
         """Run a single prediction on the model"""
         if seed is None:
@@ -327,7 +333,12 @@ class Predictor(BasePredictor):
         print(f"Using seed: {seed}")
         generator = torch.Generator("cuda").manual_seed(seed)
 
-        endpoint_url, s3_lora_path = self.split_s3_endpoint_url_and_path(s3_lora_url)
+        if ".s3." in lora_url:
+            endpoint_url, s3_lora_path = self.split_s3_endpoint_url_and_path(lora_url)
+        elif "drive.google" in lora_url:
+            s3_lora_path = lora_url
+            endpoint_url = ""
+        
         print(f"Endpoint Url: {endpoint_url}")
 
         workflow_string = self.build_workflow_string(
