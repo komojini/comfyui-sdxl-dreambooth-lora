@@ -32,7 +32,7 @@ WORKFLOW = """
     },
     "11": {
         "inputs": {
-        "lora_name": "_S3_LORA_PATH",
+        "remote_lora_path_or_url": "_S3_LORA_PATH",
         "strength_model": 1,
         "strength_clip": 1,
         "BUCKET_ENDPOINT_URL": "_BUCKET_ENDPOINT_URL",
@@ -321,7 +321,7 @@ class Predictor(BasePredictor):
         seed: int = Input(description="Sampling seed, leave Empty for Random", default=None),
         lora_url: str = Input(
             description="LoRA Model URL from aws or google drive (e.g. https://<bucket-name>.s3.<region>.amazonaws.com/<bucket-name>/<path-to-lora-model>.safetensors)", 
-            default="https://drive.google.com/file/d/1aPM277uFZu_m7bAjJBS2Ia03dP5_fk0W/view?usp=sharing"
+            default="https://drive.google.com/uc?id=1aPM277uFZu_m7bAjJBS2Ia03dP5_fk0W"
         ),
         s3_access_key: str = Input(description="Required if using non public s3 bucket", default=""),
         s3_secret_access_key: str = Input(description="Required if using non public s3 bucket", default=""),

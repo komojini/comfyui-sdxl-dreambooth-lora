@@ -25,6 +25,7 @@ build:
     - psutil
     - websocket-client==1.6.3
     - boto3
+    - gdown
   # run:
   #   - 
 
